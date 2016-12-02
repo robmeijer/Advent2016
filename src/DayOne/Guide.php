@@ -19,6 +19,13 @@ class Guide
     protected $currentDirection = 0;
 
     /**
+     * The entire journey
+     *
+     * @var array
+     */
+    protected $journey = [];
+
+    /**
      * Navigate direction instructions
      *
      * @param   string  $instructions
@@ -29,19 +36,41 @@ class Guide
     {
         ! $resetPosition || $this->resetPosition();
 
+        $this->journey[] = $this->location;
+
         foreach (explode(', ', $instructions) as $instruction) {
             $this->follow($instruction);
         }
 
-        $fewestSteps = array_sum($this->location);
+        return $this->fewestSteps($this->location);
+    }
 
-        return $fewestSteps < 0 ? -$fewestSteps : $fewestSteps;
+    /**
+     * The location visited more than once
+     *
+     * @return  array
+     */
+    public function visitedTwice()
+    {
+        $journey = [];
+        $duplicates = [];
+
+        foreach ($this->journey as $location) {
+            $steps = $location[0] . ' . ' . $location[1];
+            if (! in_array($steps, $journey)) {
+                $journey[] = $steps;
+            } else {
+                $duplicates[] = $location;
+            }
+        }
+
+        return $duplicates[0];
     }
 
     /**
      * Follow an instruction
      *
-     * @param   string $instruction
+     * @param   string  $instruction
      */
     private function follow($instruction)
     {
@@ -78,29 +107,61 @@ class Guide
     }
 
     /**
-     * @param $steps
+     * Take the given number of steps
+     *
+     * @param   int     $steps
      */
     private function takeSteps($steps)
     {
         switch ($this->currentDirection) {
             case 0:
-                $this->location[1] += $steps;
+                for ($i = 0; $i < $steps; $i++) {
+                    $this->location[1]++;
+                    $this->journey[] = $this->location;
+                }
                 break;
             case 1:
-                $this->location[0] += $steps;
+                for ($i = 0; $i < $steps; $i++) {
+                    $this->location[0]++;
+                    $this->journey[] = $this->location;
+                }
                 break;
             case 2:
-                $this->location[1] -= $steps;
+                for ($i = 0; $i < $steps; $i++) {
+                    $this->location[1]--;
+                    $this->journey[] = $this->location;
+                }
                 break;
             case 3:
-                $this->location[0] -= $steps;
+                for ($i = 0; $i < $steps; $i++) {
+                    $this->location[0]--;
+                    $this->journey[] = $this->location;
+                }
                 break;
         }
     }
 
+    /**
+     * Reset position and journey
+     */
     private function resetPosition()
     {
         $this->currentDirection = 0;
         $this->location = [0, 0];
+        $this->journey = [];
+    }
+
+    /**
+     * Calculate the fewest number of steps to the location
+     *
+     * @param   array   $location
+     * @return  int
+     */
+    public function fewestSteps($location)
+    {
+        $locationX = $location[0] < 0 ? -$location[0] : $location[0];
+        $locationY = $location[1] < 0 ? -$location[1] : $location[1];
+
+        return $locationX + $locationY;
     }
 }

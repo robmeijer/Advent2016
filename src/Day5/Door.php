@@ -15,18 +15,14 @@ class Door
      */
     public function generatePassword($id, $withPosition = false)
     {
-        for ($i = 0; $i <= PHP_INT_MAX; $i++) {
-            $hash = md5($id . $i);
-
-            if (
-                $this->hashVerified($hash) &&
-                $this->updatePassword($hash, $withPosition)
-            ) {
-                if (sizeof($this->password) === 8) {
-                    break;
-                }
+        $i = 0;
+        while (count($this->password) < 8) {
+            $hash = md5($id . $i++);
+            if ($this->hashVerified($hash)) {
+                $this->updatePassword($hash, $withPosition);
             }
         }
+        ksort($this->password);
     }
 
     /**
@@ -34,8 +30,6 @@ class Door
      */
     public function getPassword()
     {
-        ksort($this->password);
-
         return implode('', $this->password);
     }
 
@@ -45,37 +39,34 @@ class Door
      */
     private function hashVerified($hash)
     {
-        return preg_match('#^00000#', $hash);
+        return strpos($hash, '00000') === 0;
     }
 
     /**
      * @param   string  $hash
      * @param   bool    $withPosition
-     * @return  bool
      */
     private function updatePassword($hash, $withPosition)
     {
         if ($withPosition) {
-            $pos = $this->getPasswordPos($hash);
-            if (! $this->positionIsValid($pos)) {
-                return false;
+            $pos = $this->getPasswordPosition($hash);
+            if ($this->positionIsValid($pos)) {
+                $this->password[$pos] = $this->getPasswordChar($hash, 6);
             }
 
-            $this->password[$pos] = $this->getPasswordChar($hash, 6);
-            return true;
+            return;
         }
 
         $this->password[] = $this->getPasswordChar($hash);
-        return true;
     }
 
     /**
      * @param   string  $hash
      * @return  string
      */
-    private function getPasswordPos($hash)
+    private function getPasswordPosition($hash)
     {
-        return substr($hash, 5, 1);
+        return $hash[5];
     }
 
     /**
@@ -84,7 +75,7 @@ class Door
      */
     private function positionIsValid($pos)
     {
-        return is_numeric($pos) && ($pos > 0 && $pos < 7) && ! isset($this->password[$pos]);
+        return is_numeric($pos) && ($pos >= 0 && $pos <= 7) && ! isset($this->password[$pos]);
     }
 
     /**
@@ -94,6 +85,6 @@ class Door
      */
     private function getPasswordChar($hash, $charPosition = 5)
     {
-        return substr($hash, $charPosition, 1);
+        return $hash[$charPosition];
     }
 }

@@ -34,21 +34,14 @@ class Message
 
         $chars = [];
         for ($i = 0; $i < strlen($lines[0]); $i++) {
-            $chars[$i] = [];
             foreach ($lines as $line) {
-                $lineChars = str_split($line);
-                $lineChar = $lineChars[$i];
-                $chars[$i][$lineChar] = isset($chars[$i][$lineChar]) ? $chars[$i][$lineChar] + 1 : 1;
+                $chars[$i][str_split($line)[$i]] = isset($chars[$i][str_split($line)[$i]]) ? $chars[$i][str_split($line)[$i]] + 1 : 1;
             }
+            arsort($chars[$i]);
         }
 
         $message = array_map(function ($char) use ($order) {
-            if ($order == 'ASC') {
-                asort($char);
-            } else {
-                arsort($char);
-            }
-            return array_keys($char)[0];
+            return $order == 'ASC' ? end((array_keys($char))) : array_keys($char)[0];
         }, $chars);
 
         return implode('', $message);

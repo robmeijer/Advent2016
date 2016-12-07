@@ -33,13 +33,9 @@ class Address
      */
     public function verifyTLS($file)
     {
-        $lines = $this->getLines($this->filesystem->read($file));
-
-        foreach ($lines as $line) {
-            if ($this->validTLSAddress($line)) {
-                $this->addresses[] = $line;
-            }
-        }
+        $this->addresses = array_filter($this->getLines($this->filesystem->read($file)), function ($line) {
+            return $this->validTLSAddress($line);
+        });
     }
 
     /**
@@ -49,13 +45,9 @@ class Address
      */
     public function verifySSL($file)
     {
-        $lines = $this->getLines($this->filesystem->read($file));
-
-        foreach ($lines as $line) {
-            if ($this->validSSLAddress($line)) {
-                $this->addresses[] = $line;
-            }
-        }
+        $this->addresses = array_filter($this->getLines($this->filesystem->read($file)), function ($line) {
+            return $this->validSSLAddress($line);
+        });
     }
 
     /**

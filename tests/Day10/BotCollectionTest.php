@@ -24,7 +24,7 @@ class BotCollectionTest extends \PHPUnit_Framework_TestCase
             'bot 0 gives low to output 2 and high to output 0',
             'value 2 goes to bot 2',
         ];
-        $this->assertEquals($expected, $bots->instructions());
+        $this->assertEquals($expected, $bots->input());
     }
 
     public function testItCanReadAnInstruction()

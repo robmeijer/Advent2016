@@ -2,21 +2,10 @@
 
 namespace Advent2016\Day10;
 
-use League\Flysystem\FilesystemInterface;
+use Advent2016\Advent2016;
 
-class BotCollection
+class BotCollection extends Advent2016
 {
-    /**
-     * @var FilesystemInterface
-     */
-    private $filesystem;
-    /**
-     * Bot instructions
-     *
-     * @var array
-     */
-    private $instructions = [];
-
     /**
      * Collection of bots
      *
@@ -32,33 +21,13 @@ class BotCollection
     private $outputs = [];
 
     /**
-     * BotCollection constructor.
-     *
-     * @param   FilesystemInterface $filesystem
-     */
-    public function __construct(FilesystemInterface $filesystem)
-    {
-        $this->filesystem = $filesystem;
-    }
-
-    /**
-     * Import instructions
-     *
-     * @param   string   $file
-     */
-    public function import($file)
-    {
-        $this->instructions = $this->getLines($this->filesystem->read($file));
-    }
-
-    /**
      * Process all instructions
      */
     public function processInstructions()
     {
         array_map(function ($instruction) {
             $this->execute(new Instruction($instruction));
-        }, $this->instructions());
+        }, $this->input());
     }
 
     /**
@@ -81,16 +50,6 @@ class BotCollection
     public function outputs($id = false)
     {
         return $id === false ? $this->outputs : $this->outputs[$id];
-    }
-
-    /**
-     * The instructions
-     *
-     * @return  array
-     */
-    public function instructions()
-    {
-        return $this->instructions;
     }
 
     /**
@@ -143,18 +102,5 @@ class BotCollection
         }
 
         return $this->outputs[$outputId];
-    }
-
-    /**
-     * Get lines from given file contents
-     *
-     * @param   string  $contents
-     * @return  array
-     */
-    private function getLines($contents)
-    {
-        preg_match_all('/.+/', $contents, $matches);
-
-        return $matches[0];
     }
 }

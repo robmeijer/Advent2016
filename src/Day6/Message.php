@@ -41,7 +41,8 @@ class Message
         }
 
         $message = array_map(function ($char) use ($order) {
-            return $order == 'ASC' ? end((array_keys($char))) : array_keys($char)[0];
+            $keys = array_keys($char);
+            return $order == 'ASC' ? end($keys) : $keys[0];
         }, $chars);
 
         return implode('', $message);

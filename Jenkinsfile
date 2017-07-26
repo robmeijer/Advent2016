@@ -1,21 +1,22 @@
-#!/usr/bin/env groovy
+pipeline {
+    agent any
 
-node('master') {
-    try {
-        stage('build') {
-            checkout scm
-
-            sh "composer install"
+    stages {
+        stage('Build') {
+            steps {
+                checkout scm
+                composer install
+            }
         }
-        stage('test') {
-            sh "./vendor/bin/phpunit"
+        stage('Test') {
+            steps {
+                ./vendor/bin/phpunit
+            }
         }
-        stage('deploy') {
-            sh "echo 'WE ARE DEPLOYING'"
+        stage('Deploy') {
+            steps {
+                echo 'WE ARE DEPLOYING'
+            }
         }
-    } catch {
-
-    } finally {
-
     }
 }

@@ -4,7 +4,6 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                step([$class: 'WsCleanup'])
                 sh 'composer install'
             }
         }
@@ -22,6 +21,7 @@ pipeline {
     post {
         always {
             junit 'build/reports/**/*.xml'
+            step([$class: 'WsCleanup'])
         }
     }
 }

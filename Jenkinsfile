@@ -4,6 +4,7 @@ pipeline {
     stages {
         stage('Build') {
             steps {
+                step([$class: 'WsCleanup'])
                 sh 'composer install'
             }
         }
